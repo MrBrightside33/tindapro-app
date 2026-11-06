@@ -1,24 +1,43 @@
 "use client"
 
 import * as React from "react"
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
+import {
+  getServerThemeSnapshot,
+  getThemeSnapshot,
+  setTheme,
+  subscribeToTheme,
+  type Theme,
+  type ThemeSnapshot,
+} from "@/lib/theme-store"
 
-function ThemeProvider({
-  children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
+interface ThemeContextValue extends ThemeSnapshot {
+  setTheme: (theme: Theme) => void
+}
+
+const ThemeContext = React.createContext<ThemeContextValue | null>(null)
+
+function ThemeProvider({ children }: React.PropsWithChildren) {
+  const snapshot = React.useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot
+  )
+
   return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      {...props}
-    >
+    <ThemeContext.Provider value={{ ...snapshot, setTheme }}>
       <ThemeHotkey />
       {children}
-    </NextThemesProvider>
+    </ThemeContext.Provider>
   )
+}
+
+function useTheme(): ThemeContextValue {
+  const context = React.useContext(ThemeContext)
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider.")
+  }
+
+  return context
 }
 
 function isTypingTarget(target: EventTarget | null) {
@@ -69,3 +88,4 @@ function ThemeHotkey() {
 }
 
 export { ThemeProvider }
+export { useTheme }
