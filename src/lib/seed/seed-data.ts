@@ -236,5 +236,6 @@ export function createSeedData(referenceDate = new Date()): StoreDatabase {
     services,
     bills,
     suppliers,
+    notes: [],
   }
 }

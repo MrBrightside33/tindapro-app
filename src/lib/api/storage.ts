@@ -1,21 +1,34 @@
 import { createSeedData } from "@/lib/seed/seed-data"
-import type { StoreDatabase } from "@/types/domain"
+import type { Note, StoreDatabase } from "@/types/domain"
 
 const storageKey = "tindapro-store-data-v1"
 
-function isStoreDatabase(value: unknown): value is StoreDatabase {
+interface LegacyStoreDatabase {
+  schemaVersion: 1
+  sales: StoreDatabase["sales"]
+  items: StoreDatabase["items"]
+  services: StoreDatabase["services"]
+  bills: StoreDatabase["bills"]
+  suppliers: StoreDatabase["suppliers"]
+  notes?: Note[]
+}
+
+function isLegacyStoreDatabase(
+  value: unknown
+): value is LegacyStoreDatabase {
   if (typeof value !== "object" || value === null) {
     return false
   }
 
-  const database = value as Partial<StoreDatabase>
+  const database = value as Partial<LegacyStoreDatabase>
   return (
     database.schemaVersion === 1 &&
     Array.isArray(database.sales) &&
     Array.isArray(database.items) &&
     Array.isArray(database.services) &&
     Array.isArray(database.bills) &&
-    Array.isArray(database.suppliers)
+    Array.isArray(database.suppliers) &&
+    (database.notes === undefined || Array.isArray(database.notes))
   )
 }
 
@@ -38,13 +51,25 @@ export function readStoreDatabase(): StoreDatabase {
     throw new Error("Saved TindaPro data could not be parsed.", { cause: error })
   }
 
-  if (!isStoreDatabase(parsedValue)) {
+  if (!isLegacyStoreDatabase(parsedValue)) {
     throw new Error(
       "Saved TindaPro data has an unsupported or invalid structure."
     )
   }
 
-  return parsedValue
+  if (parsedValue.notes !== undefined) {
+    return {
+      ...parsedValue,
+      notes: parsedValue.notes,
+    }
+  }
+
+  const migratedDatabase: StoreDatabase = {
+    ...parsedValue,
+    notes: [],
+  }
+  writeStoreDatabase(migratedDatabase)
+  return migratedDatabase
 }
 
 export function writeStoreDatabase(database: StoreDatabase): void {

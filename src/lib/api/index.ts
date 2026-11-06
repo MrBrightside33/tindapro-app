@@ -6,6 +6,7 @@ export {
   getBills,
   updateBill,
 } from "@/lib/api/bills"
+export { createNote, deleteNote, getNotes, updateNote } from "@/lib/api/notes"
 export { deleteItem, getItems, updateItemPrices } from "@/lib/api/items"
 export {
   createSale,

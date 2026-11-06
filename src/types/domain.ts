@@ -76,6 +76,15 @@ export interface Supplier {
   deliveryFrequency: string
 }
 
+export interface Note {
+  id: string
+  title: string
+  content: string
+  pinned: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface StoreDatabase {
   schemaVersion: 1
   sales: Sale[]
@@ -83,6 +92,7 @@ export interface StoreDatabase {
   services: ServiceIncome[]
   bills: Bill[]
   suppliers: Supplier[]
+  notes: Note[]
 }
 
 export type NewSaleLine = Omit<SaleLine, "id">
@@ -102,6 +112,7 @@ export interface NewServiceIncome {
 
 export type NewBill = Omit<Bill, "id">
 export type NewSupplier = Omit<Supplier, "id">
+export type NewNote = Pick<Note, "title" | "content">
 
 export interface MonthlyAccounting {
   month: string

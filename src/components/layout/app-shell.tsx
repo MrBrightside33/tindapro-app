@@ -11,6 +11,9 @@ import { useCurrentDate } from "@/hooks/use-current-date"
 
 const pageTitles: Readonly<Record<string, string>> = {
   "/overview": "Overview",
+  "/suppliers": "Suppliers",
+  "/bills": "Bills",
+  "/notes": "Notes",
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {

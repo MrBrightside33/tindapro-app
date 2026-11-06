@@ -135,7 +135,12 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                 {group.items.map((item) => {
                   const Icon = item.icon
                   const isActive = pathname === item.href
-                  const isReady = item.href === "/overview"
+                  const isReady = [
+                    "/overview",
+                    "/suppliers",
+                    "/bills",
+                    "/notes",
+                  ].includes(item.href)
                   const className = cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                     isActive
